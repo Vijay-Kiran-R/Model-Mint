@@ -1,3 +1,5 @@
+![License](https://img.shields.io/badge/license-Apache%202.0-blue)
+
 # Model-Mint
 
 **Model-Mint** is an all-in-one platform that empowers users to:
@@ -149,7 +151,7 @@ Please ensure your code adheres to the project's coding standards and includes a
 
 ## 📄 License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [Apache License 2.0](LICENSE) © 2025 Vijay Kiran R.
 
 ---
 
