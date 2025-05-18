@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Register{% endblock %}
+
+{% block css_files %}
+  <link rel="stylesheet" href="{% static 'accounts/register.css' %}">
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.82/build/spline-viewer.js"></script>
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      AOS.init();
+    });
+  </script>
+{% endblock %}
+
+{% block content %}
+<div class="register-container">
+  <div class="register-box" data-aos="fade-right" data-aos-duration="1500">
+    <h2>Create Account</h2>
+
+    {% if messages %}
+      {% for message in messages %}
+        <p class="message">{{ message }}</p>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-field">
+        <label for="{{ form.username.id_for_label }}">Username</label>
+        {{ form.username }}
+      </div>
+      <div class="form-field">
+        <label for="{{ form.password.id_for_label }}">Password</label>
+        {{ form.password }}
+      </div>
+      <div class="form-field">
+        <label for="{{ form.ganache_address.id_for_label }}">Ganache Address</label>
+        {{ form.ganache_address }}
+      </div>
+      <div class="form-field">
+        <label for="{{ form.ganache_private_key.id_for_label }}">Ganache Private Key</label>
+        {{ form.ganache_private_key }}
+      </div>
+
+      <button type="submit">Register</button>
+    </form>
+
+    <p class="signup-link">Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+  </div>
+
+  <spline-viewer
+    class="spline-model"
+    url="https://prod.spline.design/RjZn-xcOpKGuxkSU/scene.splinecode"
+    data-aos="fade-left"
+    data-aos-duration="1500">
+  </spline-viewer>
+</div>
+{% endblock %}

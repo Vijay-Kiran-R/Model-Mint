@@ -1,0 +1,93 @@
+/* Dashboard Specific Styling */
+.main-content h1 {
+    font-size: 2.5rem;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    animation: fadeInUp 1s ease;
+  }
+  
+  .main-content h2 {
+    font-size: 1.5rem;
+    color: var(--accent);
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* Metadata Table Styling */
+  .main-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 0 12px rgba(0, 255, 255, 0.08);
+    color: var(--text);
+  }
+  
+  .main-content table thead {
+    background-color: #2f2f2f;
+  }
+  
+  .main-content th, .main-content td {
+    padding: 1rem;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 0.95rem;
+  }
+  
+  .main-content th {
+    color: var(--accent);
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  
+  .main-content tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.02);
+  }
+  
+  .main-content tr:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    transition: background 0.3s ease;
+  }
+  
+  /* Fetch Metadata Section */
+  #hashInput {
+    padding: 0.75rem;
+    border: 1px solid var(--accent);
+    border-radius: 0.5rem;
+    background-color: #222;
+    color: #fff;
+    font-size: 1rem;
+    margin-right: 1rem;
+  }
+  
+  button {
+    padding: 0.75rem 1rem;
+    border: none;
+    background: var(--accent);
+    color: #000;
+    font-weight: bold;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  button:hover {
+    background: #36a2d1;
+  }
+  
+  #result {
+    background: rgba(20, 20, 20, 0.6); /* darker glass background */
+    color: #000000; /* neon text */
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.95rem;
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    border-radius: 1rem;
+    padding: 1rem;
+    white-space: pre-wrap;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.15);
+  }
+  

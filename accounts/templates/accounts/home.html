@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css_files %}
+  <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+  <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.82/build/spline-viewer.js"></script>
+  <link rel="stylesheet" href="{% static 'accounts/home.css' %}">
+{% endblock %}
+
+{% block content %}
+<script>AOS.init();</script>
+
+<div class="home-container">
+  <!-- Hero Text -->
+  <div class="intro-section" data-aos="fade-down">
+    <h1>Welcome to AI Builder Platform</h1>
+    <p>Create powerful AI models without coding, learn how they work, and securely manage your projects using blockchain technology.</p>
+  </div>
+
+  <!-- First 2 Feature Cards -->
+  <div class="features-row">
+    <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+      <h2>🧠 Build AI</h2>
+      <p>Upload or scrape data, preprocess it, and train ML models with ease using our intuitive builder.</p>
+    </div>
+    <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+      <h2>📚 Learn</h2>
+      <p>Explore tutorials, videos, articles, and research papers to master the art of AI development.</p>
+    </div>
+  </div>
+
+  <!-- Next 2 Feature Cards -->
+  <div class="features-row">
+    <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+      <h2>🔗 Web3 Upload</h2>
+      <p>Securely upload model metadata to the blockchain. Own and track your models transparently.</p>
+    </div>
+    <div class="feature-card" data-aos="fade-up" data-aos-delay="400">
+      <h2>💾 Deploy Models</h2>
+      <p>Export your trained models as apps or bots and let users interact with your AI instantly.</p>
+    </div>
+  </div>
+
+  <!-- CTA Button -->
+  <div class="cta-button" data-aos="fade-up" data-aos-delay="500">
+    {% if user.is_authenticated %}
+      <a href="{% url 'build_model' %}">Start Building</a>
+    {% else %}
+      <a href="{% url 'register' %}">Join Now</a>
+    {% endif %}
+  </div>
+
+  <!-- 3D Background Viewer -->
+  <div class="spline-background">
+    <spline-viewer 
+      url="https://prod.spline.design/ibp7jS1cqRafahKC/scene.splinecode"
+      mouse-controls>
+    </spline-viewer>
+  </div>
+  
+</div>
+{% endblock %}

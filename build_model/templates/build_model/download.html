@@ -1,0 +1,481 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Download Model{% endblock %}
+
+{% block css_files %}
+<link rel="stylesheet" href="{% static 'build_model/base.css' %}">
+<link rel="stylesheet" href="{% static 'build_model/download.css' %}">
+<style>
+  /* Base styles with glassmorphism effect */
+  .build-model-container {
+    --glass-dark: rgba(15, 15, 20, 0.75);
+    --border-glow: rgba(120, 220, 232, 0.15);
+    --accent-green: #4caf50;
+    --accent-green-dark: #2E7D32;
+    --accent-green-light: #81c784;
+    --accent-orange: #ff9800;
+    --accent-red: #f44336;
+    --text-light: #f3f3f3;
+    --text-dark: #1a1a1a;
+    --bg-dark: #121212;
+  }
+
+  /* Form and sections styling */
+  #download-form {
+    background: var(--glass-dark);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border-glow);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(30, 30, 35, 0.6);
+    color: var(--text-light);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: var(--accent-green);
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+  }
+
+  /* Button styling with gradients */
+  .btn-submit {
+    background: linear-gradient(45deg, var(--accent-green), var(--accent-green-dark));
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.9rem;
+  }
+
+  .btn-submit:hover {
+    background: linear-gradient(45deg, var(--accent-green-dark), #1B5E20);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .btn-submit:active {
+    transform: translateY(1px);
+  }
+
+  .btn-disabled {
+    background: linear-gradient(45deg, #666666, #444444);
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .btn-success {
+    background: linear-gradient(45deg, var(--accent-green), var(--accent-green-dark));
+  }
+
+  .btn-reset {
+    background: linear-gradient(45deg, var(--accent-orange), #e65100);
+    color: white;
+    display: none;
+    margin-top: 10px;
+  }
+
+  /* Enhanced progress bar styling */
+  .progress-container {
+    margin-top: 20px;
+    height: 12px;
+    background: rgba(30, 30, 35, 0.6);
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    transition: width 0.5s ease;
+    position: relative;
+    border-radius: 20px;
+    background: linear-gradient(90deg, var(--accent-green-dark), var(--accent-green), var(--accent-green-light));
+    background-size: 200% 200%;
+    animation: gradientShift 3s ease infinite;
+  }
+
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .progress-bar.error {
+    background: linear-gradient(90deg, #d32f2f, var(--accent-red), #f05545);
+    animation: gradientShiftError 2s ease infinite;
+  }
+
+  @keyframes gradientShiftError {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .progress-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    line-height: 12px;
+    color: var(--text-light);
+    font-weight: 500;
+    font-size: 0.75rem;
+    z-index: 2;
+    top: 12px;
+    text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.8);
+    transition: all 0.3s ease;
+  }
+
+  /* Status and log styling */
+  .build-status {
+    margin-top: 20px;
+    font-weight: bold;
+    padding: 10px 15px;
+    border-radius: 8px;
+    display: inline-block;
+    transition: all 0.3s ease;
+  }
+
+  .build-status.success {
+    color: var(--text-light);
+    background: rgba(76, 175, 80, 0.15);
+    border-left: 4px solid var(--accent-green);
+  }
+
+  .build-status.error {
+    color: var(--text-light);
+    background: rgba(244, 67, 54, 0.15);
+    border-left: 4px solid var(--accent-red);
+  }
+
+  .build-log {
+    margin-top: 20px;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    background: rgba(30, 30, 35, 0.6);
+    white-space: pre-wrap;
+    border-radius: 8px;
+    color: var(--text-light);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+
+  .error-container {
+    background: rgba(244, 67, 54, 0.1);
+    border-left: 4px solid var(--accent-red);
+    padding: 1rem;
+    margin-top: 1rem;
+    border-radius: 0.25rem;
+    color: #ffcdd2;
+  }
+
+  /* Animation for status messages */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .build-status, .error-container {
+    animation: fadeIn 0.5s ease forwards;
+  }
+
+  /* Success animation */
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+  }
+
+  .build-status.success {
+    animation: fadeIn 0.5s ease forwards, pulse 1.5s infinite;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="build-model-container">
+  <!-- Sidebar -->
+  <aside class="sidebar" data-aos="fade-right" data-aos-duration="800">
+    <ul>
+      <li><a href="{% url 'upload' %}" title="Upload"><span class="icon">📤</span><span class="label">Upload</span></a></li>
+      <li><a href="{% url 'profiling' %}" title="Profiling"><span class="icon">📊</span><span class="label">Profiling</span></a></li>
+      <li><a href="{% url 'preprocessing' %}" title="Preprocessing"><span class="icon">🧹</span><span class="label">Preprocessing</span></a></li>
+      <li><a href="{% url 'model' %}" title="Model"><span class="icon">🤖</span><span class="label">Model</span></a></li>
+      <li><a href="{% url 'predict' %}" title="Predict"><span class="icon">🔮</span><span class="label">Predict</span></a></li>
+      <li><a href="{% url 'dashboard' %}" title="Blockchain"><span class="icon">🔗</span><span class="label">Blockchain</span></a></li>
+      <li class="active"><a href="{% url 'download' %}" title="Download"><span class="icon">📥</span><span class="label">Download</span></a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <section class="main-content">
+    <h2>Download Your Trained Model</h2>
+    <p>Select how you want to download your trained model and GUI application.</p>
+
+    <form id="download-form" method="POST">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="bundle">Select Format:</label>
+        <select name="bundle" id="bundle" class="form-control">
+          <option value="true">Standalone Executable (.exe)</option>
+          <option value="false">Python Script & Model Files (.zip)</option>
+        </select>
+      </div>
+      <div class="button-group">
+        <button type="submit" id="action-button" class="btn-submit">Generate App</button>
+        <button type="button" id="reset-button" class="btn-submit btn-reset">Start Again</button>
+      </div>
+    </form>
+
+    <!-- Build Status -->
+    <div id="build-status" class="build-status" style="display: none;"></div>
+
+    <!-- Progress Bar Container -->
+    <div class="progress-container" id="progress-container" style="display: none;">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    <div class="progress-text" id="progress-text" style="display: none;">0%</div>
+
+    <!-- Error Message -->
+    <div id="error-message" class="error-container" style="display: none;"></div>
+
+    <!-- Build Log -->
+    <div id="build-log" class="build-log">Waiting for build to start...</div>
+  </section>
+</div>
+
+<script>
+document.getElementById("download-form").addEventListener("submit", function(e) {
+  e.preventDefault();
+  const actionButton = document.getElementById("action-button");
+  const resetButton = document.getElementById("reset-button");
+  const progressContainer = document.getElementById("progress-container");
+  const progressBar = document.getElementById("progress-bar");
+  const progressText = document.getElementById("progress-text");
+  const buildLog = document.getElementById("build-log");
+  const errorMessage = document.getElementById("error-message");
+  const buildStatus = document.getElementById("build-status");
+  
+  // Reset UI
+  errorMessage.style.display = "none";
+  buildStatus.style.display = "none";
+  buildStatus.className = "build-status";
+  progressContainer.style.display = "block";
+  progressText.style.display = "block";
+  progressBar.className = "progress-bar";
+  progressBar.style.width = "0%";
+  progressText.textContent = "0% - Initializing";
+  buildLog.textContent = "Starting build process...";
+  
+  // Disable form and button
+  document.getElementById("bundle").disabled = true;
+  actionButton.disabled = true;
+  actionButton.classList.add("btn-disabled");
+  actionButton.textContent = "Generating...";
+  
+  // Send the POST request to start the build
+  const formData = new FormData(this);
+  fetch("{% url 'download' %}", {
+    method: "POST",
+    body: formData,
+    headers: {
+      "X-CSRFToken": "{{ csrf_token }}"
+    }
+  })
+  .then(response => {
+    if (!response.ok) {
+      return response.json().then(data => {
+        throw new Error(data.error || "Server error");
+      });
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (data.error) {
+      throw new Error(data.error);
+    }
+    
+    // Build started successfully, now set up progress polling
+    startProgressPolling();
+  })
+  .catch(error => {
+    // Initial request failed
+    handleError(error.message);
+  });
+  
+  function startProgressPolling() {
+    // Set up progress polling
+    let pollCount = 0;
+    const maxPolls = 300; // 5 minutes at 1 second intervals
+    let buildComplete = false;
+    
+    const pollProgress = setInterval(() => {
+      pollCount++;
+      if (pollCount > maxPolls && !buildComplete) {
+        clearInterval(pollProgress);
+        handleError("Build timeout - process took too long");
+        return;
+      }
+      
+      // Create a new FormData for the progress check
+      const progressData = new FormData();
+      progressData.append('action', 'check_progress');
+      
+      fetch("{% url 'download' %}", {
+        method: "POST",
+        body: progressData,
+        headers: {
+          "X-CSRFToken": "{{ csrf_token }}",
+          "X-Requested-With": "XMLHttpRequest"
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Update progress info
+        if (data.progress) {
+          const percent = data.progress.percent;
+          const message = data.progress.message;
+          
+          // Update progress bar - smooth animation
+          progressBar.style.width = Math.max(0, percent) + "%";
+          progressText.textContent = Math.abs(percent) + "% - " + message;
+          
+          // If we have an error (negative progress)
+          if (percent < 0) {
+            progressBar.classList.add("error");
+            buildStatus.textContent = "Build Failed: " + message;
+            buildStatus.classList.add("error");
+            buildStatus.style.display = "block";
+            resetButton.style.display = "inline-block";
+            
+            // Enable reset button
+            document.getElementById("bundle").disabled = false;
+            actionButton.disabled = false;
+            actionButton.classList.remove("btn-disabled");
+            actionButton.textContent = "Try Again";
+            
+            clearInterval(pollProgress);
+          }
+        }
+        
+        // Update build log if available
+        if (data.log) {
+          buildLog.textContent = data.log;
+          // Auto-scroll to bottom - smooth
+          buildLog.scrollTo({
+            top: buildLog.scrollHeight,
+            behavior: 'smooth'
+          });
+        }
+        
+        // Check for errors
+        if (data.error) {
+          handleError(data.error);
+          clearInterval(pollProgress);
+          return;
+        }
+        
+        // Check if build is complete
+        if (data.complete && data.download_url) {
+          buildComplete = true;
+          
+          // Update progress to 100% with animation
+          progressBar.style.width = "100%";
+          progressText.textContent = "100% - Build Complete";
+          
+          // Update status with success animation
+          buildStatus.textContent = "Build Completed Successfully!";
+          buildStatus.classList.add("success");
+          buildStatus.style.display = "block";
+          
+          // Change button to Download mode with animation
+          setTimeout(() => {
+            actionButton.disabled = false;
+            actionButton.classList.remove("btn-disabled");
+            actionButton.classList.add("btn-success");
+            actionButton.textContent = "Download App";
+            resetButton.style.display = "inline-block";
+          }, 500);
+          
+          // Update button click behavior to redirect to the download URL
+          actionButton.onclick = function() {
+            window.location.href = data.download_url;
+            return false;
+          };
+          
+          clearInterval(pollProgress);
+        }
+      })
+      .catch(error => {
+        console.warn("Progress check failed:", error);
+        // Don't stop polling on a single failed request
+      });
+    }, 1000);
+  }
+  
+  function handleError(message) {
+    progressContainer.style.display = "none";
+    progressText.style.display = "none";
+    
+    // Reset the form
+    document.getElementById("bundle").disabled = false;
+    actionButton.disabled = false;
+    actionButton.classList.remove("btn-disabled");
+    actionButton.textContent = "Generate App";
+    resetButton.style.display = "inline-block";
+    
+    // Display error message with animation
+    errorMessage.style.display = "block";
+    errorMessage.textContent = "Error: " + message;
+    
+    buildStatus.textContent = "Build Failed";
+    buildStatus.classList.add("error");
+    buildStatus.style.display = "block";
+    
+    console.error("Error:", message);
+  }
+});
+
+// Reset button functionality with animation
+document.getElementById("reset-button").addEventListener("click", function() {
+  // Add quick fade-out effect
+  document.getElementById("progress-container").style.opacity = "0";
+  document.getElementById("build-status").style.opacity = "0";
+  document.getElementById("error-message").style.opacity = "0";
+  
+  // Then reload after short delay
+  setTimeout(() => {
+    window.location.reload();
+  }, 300);
+});
+</script>
+{% endblock %}

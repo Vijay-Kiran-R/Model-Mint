@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}AI Model Dashboard{% endblock %}
+
+{% block css_files %}
+<link rel="stylesheet" href="{% static 'build_model/base.css' %}">
+<link rel="stylesheet" href="{% static 'build_model/dashboard.css' %}">
+{% endblock %}
+
+
+{% block content %}
+<div class="build-model-container">
+  <aside class="sidebar" data-aos="fade-right" data-aos-duration="800">
+    <ul>
+      <li><a href="{% url 'upload' %}" title="Upload"><span class="icon">📤</span><span class="label">Upload</span></a></li>
+      <li><a href="{% url 'profiling' %}" title="Profiling"><span class="icon">📊</span><span class="label">Profiling</span></a></li>
+      <li><a href="{% url 'preprocessing' %}" title="Preprocessing"><span class="icon">🧹</span><span class="label">Preprocessing</span></a></li>
+      <li><a href="{% url 'model' %}" title="Model"><span class="icon">🤖</span><span class="label">Model</span></a></li>
+      <li><a href="{% url 'predict' %}" title="Predict"><span class="icon">🔮</span><span class="label">Predict</span></a></li>
+      <li class="active"><a href="{% url 'dashboard' %}" title="Blockchain"><span class="icon">🔗</span><span class="label">Blockchain</span></a></li>
+      <li><a href="{% url 'download' %}" title="Download"><span class="icon">📥</span><span class="label">Download</span></a></li>
+    </ul>
+  </aside>
+
+  <section class="main-content">
+    <h1>🧠 Your AI Model Projects</h1>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Hash ID</th>
+          <th>Username</th>
+          {% comment %} <th>Timestamp</th> {% endcomment %}
+          <th>Blockchain Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for project in projects %}
+        <tr>
+          <td>{{ project.title }}</td>
+          <td>{{ project.hash }}</td>
+          <td>{{ project.username }}</td>
+          {% comment %} <td>{{ project.timestamp }}</td> {% endcomment %}
+          <td>{{ project.uploaded|yesno:"✅ Uploaded,❌ Not Uploaded" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <h2>🔍 Fetch Model Metadata from Blockchain</h2>
+    <input type="text" id="hashInput" placeholder="Enter Hash ID" style="width: 300px;" />
+    <button onclick="fetchMetadata()">Fetch</button>
+
+    <pre id="result" style="margin-top:20px; padding: 15px; background: #f4f4f4;"></pre>
+  </section>
+</div>
+
+<script>
+  function fetchMetadata() {
+    const hash = document.getElementById("hashInput").value;
+    fetch("/build_model/fetch-metadata/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token }}"
+      },
+      body: JSON.stringify({ hash: hash })
+    })
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById("result").innerText = JSON.stringify(data, null, 4);
+    })
+    .catch(error => {
+      document.getElementById("result").innerText = "Error: " + error;
+    });
+  }
+</script>
+{% endblock %}

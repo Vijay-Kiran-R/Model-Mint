@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Learn - Explore AI{% endblock %}
+
+{% block css_files %}
+  <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+  <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.82/build/spline-viewer.js"></script>
+  <link rel="stylesheet" href="{% static 'learn/learn.css' %}">
+{% endblock %}
+
+{% block content %}
+<script>AOS.init();</script>
+
+<div class="learn-container">
+  <!-- 3D Background Viewer -->
+  <div class="spline-background">
+    <spline-viewer 
+      url="https://prod.spline.design/kQlopMALBd16zIQW/scene.splinecode"
+      mouse-controls>
+    </spline-viewer>
+  </div>
+
+  <!-- Search Section -->
+  <div class="search-box" data-aos="fade-up">
+    <h1>What do you want to learn?</h1>
+    <form method="GET" action="{% url 'learn' %}">
+      <input type="text" name="query" placeholder="Search tutorials, videos, blogs..." value="{{ query }}" required>
+      <select name="filter">
+        <option value="">All</option>
+        <option value="YouTube Video" {% if filter_type == "YouTube Video" %}selected{% endif %}>YouTube</option>
+        <option value="Blog Post" {% if filter_type == "Blog Post" %}selected{% endif %}>Blogs</option>
+        <option value="GitHub Repository" {% if filter_type == "GitHub Repository" %}selected{% endif %}>GitHub</option>
+        <option value="Document" {% if filter_type == "Document" %}selected{% endif %}>Documents</option>
+        <option value="Web Article" {% if filter_type == "Web Article" %}selected{% endif %}>Articles</option>
+      </select>
+      <button type="submit">Search</button>
+    </form>
+  </div>
+
+  {% if query %}
+    <h2 class="result-title" data-aos="fade-up">Results for "{{ query }}"</h2>
+    <div class="results-wrapper">
+      {% for result in paged_items %}
+        <div class="result-card" data-aos="fade-up">
+          {% if result.content_type == "YouTube Video" and result.youtube_id %}
+            <iframe src="https://www.youtube.com/embed/{{ result.youtube_id }}" frameborder="0" allowfullscreen></iframe>
+          {% endif %}
+          <h3>{{ result.title }}</h3>
+          <p>{{ result.description }}</p>
+          <a href="{{ result.url }}" target="_blank">View</a>
+        </div>
+      {% empty %}
+        <p>No results found.</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>
+
+{% endblock %}

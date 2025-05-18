@@ -1,0 +1,74 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Model Platform{% endblock %}</title>
+    
+    <link rel="stylesheet" href="{% static 'app.css' %}">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    {% block css_files %}
+    {% endblock %}
+</head>
+<body>
+    <div class="glass-header-container">
+        <header class="glass-header">
+            <div class="logo-container" data-aos="fade-right" data-aos-duration="1000">
+                <a href="{% url 'home' %}">
+                    <img src="{% static 'logo.png' %}" alt="Model Platform Logo" class="logo" />
+                </a>
+            </div>
+            
+            <input type="checkbox" id="nav-toggle" class="nav-toggle">
+            <label for="nav-toggle" class="nav-toggle-label">
+                <span></span>
+            </label>
+            
+            <nav class="glass-nav">
+                <ul>
+                    {% if user.is_authenticated %}
+                        <li><a data-aos="fade-down" data-aos-duration="800" href="{% url 'home' %}"><i class="fas fa-home"></i> Home</a></li>
+                        <li><a data-aos="fade-down" data-aos-duration="1000" href="{% url 'build_model' %}"><i class="fas fa-tools"></i> Build Model</a></li>
+                        <li><a data-aos="fade-down" data-aos-duration="1200" href="{% url 'learn' %}"><i class="fas fa-graduation-cap"></i> Learn</a></li>
+                        <li><a data-aos="fade-down" data-aos-duration="1400" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                    {% else %}
+                        <li><a data-aos="fade-down" data-aos-duration="800" href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+                        <li><a data-aos="fade-down" data-aos-duration="1000" href="{% url 'register' %}"><i class="fas fa-user-plus"></i> Sign Up</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </header>
+    </div>
+
+    <main class="main-content">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="glass-footer">
+        <div class="footer-content">
+            <p>&copy; 2025 AI Platform. All rights reserved.</p>
+            <div class="footer-links">
+                {% comment %} <a href="#"><i class="fab fa-twitter"></i></a> {% endcomment %}
+                <a href="https://github.com/Vijay-Kiran-R" target="_blank" rel="noopener noreferrer">
+                    <i class="fab fa-github"></i>
+                </a>
+                
+                <a href="https://www.linkedin.com/in/vijay-kiran-r/" target="_blank" rel="noopener noreferrer">
+                    <i class="fab fa-linkedin"></i>
+                </a>
+                
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+      AOS.init();
+    </script>
+</body>
+</html>

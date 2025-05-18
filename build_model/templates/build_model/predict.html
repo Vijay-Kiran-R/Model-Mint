@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Predict with Model{% endblock %}
+
+{% block css_files %}
+<link rel="stylesheet" href="{% static 'build_model/base.css' %}">
+<link rel="stylesheet" href="{% static 'build_model/predict.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="build-model-container">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" data-aos="fade-right" data-aos-duration="800">
+    <ul>
+      <li><a href="{% url 'upload' %}" title="Upload"><span class="icon">📤</span><span class="label">Upload</span></a></li>
+      <li><a href="{% url 'profiling' %}" title="Profiling"><span class="icon">📊</span><span class="label">Profiling</span></a></li>
+      <li><a href="{% url 'preprocessing' %}" title="Preprocessing"><span class="icon">🧹</span><span class="label">Preprocessing</span></a></li>
+      <li><a href="{% url 'model' %}" title="Model"><span class="icon">🤖</span><span class="label">Model</span></a></li>
+      <li class="active"><a href="{% url 'predict' %}" title="Predict"><span class="icon">🔮</span><span class="label">Predict</span></a></li>
+      <li><a href="{% url 'dashboard' %}" title="Blockchain"><span class="icon">🔗</span><span class="label">Blockchain</span></a></li>
+      <li><a href="{% url 'download' %}" title="Download"><span class="icon">📥</span><span class="label">Download</span></a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <section class="main-content">
+    <h2 class="section-heading neon-text">🔮 Make a Prediction</h2>
+
+    {% if error_message %}
+      <div class="error-container neon-red">
+        {{ error_message }}
+      </div>
+    {% endif %}
+
+    <form method="POST" id="predict-form" class="model-form">
+      {% csrf_token %}
+      {% for feature in feature_columns %}
+      <div class="form-group">
+        <label for="{{ feature }}" class="form-label">{{ feature }}</label>
+        <input type="text" name="{{ feature }}" id="{{ feature }}" class="form-control glass-input" required>
+      </div>
+      {% endfor %}
+      <button type="submit" class="btn-submit neon-button">Predict</button>
+    </form>
+
+    {% if prediction_result %}
+    <div id="prediction-result" class="report-container glass-card">
+      <h3 class="neon-text">Prediction Result:</h3>
+      <p>{{ prediction_result.prediction }}</p>
+    </div>
+    {% endif %}
+  </section>
+
+</div>
+{% endblock %}

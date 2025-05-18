@@ -1,0 +1,405 @@
+{% extends "base.html" %}
+{% comment %} {% extends "base.html" %}
+{% load static %}
+
+{% block title %}Model Training{% endblock %}
+
+{% block css_files %}
+<link rel="stylesheet" href="{% static 'build_model/build_model.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <ul>
+      <li><a href="{% url 'upload' %}">Upload</a></li>
+      <li><a href="{% url 'profiling' %}">Profiling</a></li>
+      <li><a href="{% url 'model' %}" class="active">Model</a></li>
+      <li><a href="{% url 'predict' %}">Predict</a></li>
+      <li><a href="{% url 'download' %}">Download</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <section class="main-content">
+    
+    <h2>Build Your Model</h2>
+
+    <!-- Cleaning Summary -->
+    <div class="summary-container">
+      <h3>Data Cleaning Summary:</h3>
+      <ul>
+        {% for msg in cleaning_summary %}
+          <li>{{ msg }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <!-- Model Form -->
+    <form method="POST" id="train-form" class="model-form">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="model-title">Model Title:</label>
+        <input type="text" name="model_title" id="model-title" class="form-control" required placeholder="Enter a title for your model">
+      </div>
+
+      <div class="form-group">
+        <label for="model-type">Select Model Type:</label>
+        <select name="model_type" id="model-type" class="form-control">
+          <option value="regression">Regression (Prediction)</option>
+          <option value="classification">Classification</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="target-column">Select Target Column:</label>
+        <select name="target_column" id="target-column" class="form-control">
+          {% for col in columns %}
+            <option value="{{ col }}">{{ col }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Select Feature Columns:</label>
+        <div class="checkbox-group">
+          {% for col in columns %}
+            <label>
+              <input type="checkbox" name="feature_columns" value="{{ col }}"> {{ col }}
+            </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit">Train Model</button>
+    </form>
+
+    <!-- Training Progress -->
+    <div id="training-progress" class="progress-container" style="display: none;">
+      <h3>Training Progress:</h3>
+      <p id="progress-text">Training started...</p>
+      <progress id="progress-bar" value="0" max="100"></progress>
+    </div>
+
+    <!-- Training Report -->
+    <div id="training-report" class="report-container" style="display:none;">
+      <h3>Training Report:</h3>
+      <div id="report-metrics"></div>
+      <button id="upload-button" class="btn-submit" style="display: none;">Upload to Blockchain</button>
+    </div>
+
+    <!-- Error Message -->
+    <div id="error-message" class="error-container" style="display: none; color: red;"></div>
+
+  </section>
+</div>
+
+<!-- JavaScript -->
+<script>
+document.getElementById("train-form").addEventListener("submit", function(event) {
+    event.preventDefault();
+    let formData = new FormData(this);
+
+    // Display training progress
+    document.getElementById("training-progress").style.display = "block";
+    document.getElementById("progress-text").innerText = "Training started...";
+    document.getElementById("progress-bar").value = 0;
+
+    fetch("{% url 'model' %}", {
+        method: "POST",
+        body: formData,
+        headers: { "X-CSRFToken": "{{ csrf_token }}" }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        document.getElementById("progress-bar").value = 100;
+        document.getElementById("progress-text").innerText = "Training completed!";
+        document.getElementById("training-report").style.display = "block";
+
+        let reportMetrics = document.getElementById("report-metrics");
+        reportMetrics.innerHTML = `
+          <p><strong>Model Training Status:</strong> ${data.message}</p>
+          <h4>Metrics:</h4>
+          <ul>
+            ${Object.entries(data.metrics).map(([key, value]) => `<li><strong>${key}:</strong> ${value}</li>`).join('')}
+          </ul>
+          <p><strong>Model saved at:</strong> ${data.model_path}</p>
+          <p><strong>Model Title:</strong> ${data.title}</p>
+          <p><strong>Model Hash ID:</strong> <code>${data.model_hash}</code></p>
+        `;
+
+        // Store data for blockchain upload
+        window.modelMetadata = {
+            model_hash: data.model_hash,
+            title: data.title,
+            username: data.username,
+            account_id: data.account_id,
+            timestamp: data.timestamp
+        };
+
+        // Show blockchain upload button
+        document.getElementById("upload-button").style.display = "inline-block";
+    })
+    .catch(error => {
+        document.getElementById("error-message").style.display = "block";
+        document.getElementById("error-message").innerText = `Error: ${error.message}`;
+        console.error("Error:", error);
+    });
+});
+
+// Blockchain Upload Button
+document.getElementById("upload-button").addEventListener("click", function() {
+    fetch("{% url 'upload_to_blockchain' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify(window.modelMetadata)
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("Blockchain upload failed.");
+        return res.json();
+    })
+    .then(data => {
+        alert(`Model metadata successfully uploaded to blockchain!\nTransaction hash: ${data.tx_hash}`);
+    })
+    .catch(error => {
+        alert(`Blockchain upload failed: ${error.message}`);
+        console.error("Upload error:", error);
+    });
+});
+</script>
+
+{% endblock %} {% endcomment %}
+
+
+
+{% load static %}
+
+{% block title %}Model Training{% endblock %}
+
+{% block css_files %}
+<link rel="stylesheet" href="{% static 'build_model/base.css' %}">
+<link rel="stylesheet" href="{% static 'build_model/model.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="build-model-container">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" data-aos="fade-right" data-aos-duration="800">
+    <ul>
+      <li><a href="{% url 'upload' %}" title="Upload"><span class="icon">📤</span><span class="label">Upload</span></a></li>
+      <li><a href="{% url 'profiling' %}" title="Profiling"><span class="icon">📊</span><span class="label">Profiling</span></a></li>
+      <li><a href="{% url 'preprocessing' %}" title="Preprocessing"><span class="icon">🧹</span><span class="label">Preprocessing</span></a></li>
+      <li class="active"><a href="{% url 'model' %}" title="Model"><span class="icon">🤖</span><span class="label">Model</span></a></li>
+      <li><a href="{% url 'predict' %}" title="Predict"><span class="icon">🔮</span><span class="label">Predict</span></a></li>
+      <li><a href="{% url 'dashboard' %}" title="Blockchain"><span class="icon">🔗</span><span class="label">Blockchain</span></a></li>
+      <li><a href="{% url 'download' %}" title="Download"><span class="icon">📥</span><span class="label">Download</span></a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <section class="main-content">
+
+    <h2>Build Your Model</h2>
+
+    <!-- Cleaning Summary -->
+    <div class="summary-container">
+      <h3>Data Cleaning Summary:</h3>
+      <ul>
+        {% for msg in cleaning_summary %}
+          <li>{{ msg }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <!-- Model Form -->
+    <form method="POST" id="train-form" class="model-form">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="model-title">Model Title:</label>
+        <input type="text" name="model_title" id="model-title" class="form-control" required placeholder="Enter a title for your model">
+      </div>
+
+      <div class="form-group">
+        <label for="model-type">Select Model Type:</label>
+        <select name="model_type" id="model-type" class="form-control">
+          <option value="regression">Regression (Prediction)</option>
+          <option value="classification">Classification</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="target-column">Select Target Column:</label>
+        <select name="target_column" id="target-column" class="form-control">
+          {% for col in columns %}
+            <option value="{{ col }}">{{ col }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Select Feature Columns:</label>
+        <div class="checkbox-group">
+          {% for col in columns %}
+            <label>
+              <input type="checkbox" name="feature_columns" value="{{ col }}"> {{ col }}
+            </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit">Train Model</button>
+    </form>
+
+    <div class="form-group">
+      <label for="search_time">Search Time (minutes)</label>
+      <input type="number" class="form-control" id="search_time" name="search_time" 
+             min="1" max="30" value="5">
+      <small class="form-text text-muted">Time budget for neural architecture search (1-30 minutes)</small>
+  </div>
+  
+  <div class="form-group">
+      <label for="search_iterations">Search Iterations</label>
+      <input type="number" class="form-control" id="search_iterations" name="search_iterations" 
+             min="3" max="20" value="5">
+      <small class="form-text text-muted">Maximum number of model architectures to try</small>
+  </div>
+
+
+
+    <!-- Training Progress -->
+    <div id="training-progress" class="progress-container" style="display: none;">
+      <h3>Training Progress:</h3>
+      <p id="progress-text">Training started...</p>
+      <progress id="progress-bar" value="0" max="100"></progress>
+    </div>
+
+    <!-- Training Report -->
+    <div id="training-report" class="report-container" style="display:none;">
+      <h3>Training Report:</h3>
+      <div id="report-metrics"></div>
+    </div>
+
+    <!-- Upload to Blockchain Section -->
+    <div id="upload-blockchain" class="upload-container" style="display:none;">
+      <h3>Upload to Blockchain</h3>
+      <p><strong>Model Title:</strong> <span id="blockchain-model-title"></span></p>
+      <button class="btn-submit" onclick="uploadToBlockchain()">Upload to Blockchain</button>
+      <p id="upload-status" style="margin-top:10px;"></p>
+    </div>
+
+    <!-- Error Message -->
+    <div id="error-message" class="error-container" style="display: none; color: red;"></div>
+
+  </section>
+</div>
+
+<!-- JavaScript -->
+<script>
+document.getElementById("train-form").addEventListener("submit", function(event) {
+    event.preventDefault();
+    let formData = new FormData(this);
+
+    // Display training progress
+    document.getElementById("training-progress").style.display = "block";
+    document.getElementById("progress-text").innerText = "Training started...";
+    document.getElementById("progress-bar").value = 0;
+
+    fetch("{% url 'model' %}", {
+        method: "POST",
+        body: formData,
+        headers: { "X-CSRFToken": "{{ csrf_token }}" }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        document.getElementById("progress-bar").value = 100;
+        document.getElementById("progress-text").innerText = "Training completed!";
+        document.getElementById("training-report").style.display = "block";
+
+        let reportMetrics = document.getElementById("report-metrics");
+        reportMetrics.innerHTML = `
+          <p><strong>Model Training Status:</strong> ${data.message}</p>
+          <h4>Metrics:</h4>
+          <ul>
+            ${Object.entries(data.metrics).map(([key, value]) => `<li><strong>${key}:</strong> ${value}</li>`).join('')}
+          </ul>
+          <p><strong>Model saved at:</strong> ${data.model_path}</p>
+          <p><strong>Model Title:</strong> ${data.title}</p>
+          <p><strong>Model Hash ID:</strong> <code id="model-hash">${data.model_hash}</code></p>
+        `;
+
+        // Store metadata for blockchain
+        window.modelMetadata = {
+            model_hash: data.model_hash,
+            username: data.username,
+            account_id: data.account_id,
+            timestamp: data.timestamp,
+            title: data.title
+        };
+
+        // Show blockchain upload section
+        document.getElementById("upload-blockchain").style.display = "block";
+        document.getElementById("blockchain-model-title").innerText = data.title;
+    })
+    .catch(error => {
+        document.getElementById("error-message").style.display = "block";
+        document.getElementById("error-message").innerText = `Error: ${error.message}`;
+        console.error("Error:", error);
+    });
+});
+
+function uploadToBlockchain() {
+  const metadata = window.modelMetadata;
+
+  if (!metadata || !metadata.title || !metadata.model_hash || !metadata.username || !metadata.account_id || !metadata.timestamp) {
+      alert("Model metadata is missing or incomplete.");
+      return;
+  }
+
+  document.getElementById("upload-status").innerText = "Uploading to blockchain...";
+
+  fetch("{% url 'upload_to_blockchain' %}", {
+      method: "POST",
+      headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": "{{ csrf_token }}"
+      },
+      body: JSON.stringify({
+        hash: metadata.model_hash,
+        title: metadata.title,
+        username: metadata.username,
+        account_id: metadata.account_id,
+        timestamp: metadata.timestamp
+    })
+    
+  })
+  .then(response => response.json())
+  .then(data => {
+      document.getElementById("upload-status").innerText = data.message;
+  })
+  .catch(error => {
+      document.getElementById("upload-status").innerText = "Error uploading to blockchain.";
+      console.error("Upload error:", error);
+  });
+}
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,10 @@
+# Ignore Python virtual environment
+aiplatform-env/
+
+# Optional Python ignores
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.DS_Store

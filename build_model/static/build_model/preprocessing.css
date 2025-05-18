@@ -1,0 +1,316 @@
+
+/* Preprocessing page specific styles - extends base.css */
+
+/* Additional variables */
+:root {
+  --card-bg: rgba(30, 40, 50, 0.7);
+  --border-radius: 0.75rem;
+  --transition-speed: 0.3s;
+  --highlight: #88BDF2;
+  --highlight-hover: #a1cdf5;
+  --section-spacing: 2rem;
+}
+
+/* Main preprocessing section styling */
+.preprocessing-section {
+  flex: 1;
+  padding: 2rem;
+  color: var(--text);
+  animation: fadeInUp 0.8s ease-out;
+}
+
+/* Report containers styling */
+.report-container {
+  background: rgba(30, 40, 50, 0.4);
+  border-radius: var(--border-radius);
+  margin-bottom: var(--section-spacing);
+  padding: 1.5rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(136, 189, 242, 0.2);
+}
+
+.report-container h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0;
+}
+
+/* Stats cards styling */
+.stats-card {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.stat-card {
+  background: rgba(20, 30, 40, 0.6);
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Accordion styling */
+.accordion .card {
+  background: var(--glass-dark);
+  border: 1px solid rgba(136, 189, 242, 0.2);
+  border-radius: var(--border-radius);
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.accordion .card-header {
+  background: var(--card-bg);   
+  padding: 0;
+  border-bottom: 1px solid rgba(136, 189, 242, 0.1);
+}
+
+.accordion .btn-link {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+  width: 100%;
+  text-align: left;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.accordion .btn-link:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+.accordion .btn-link::after {
+  content: '▼';
+  position: absolute;
+  right: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.accordion .btn-link.collapsed::after {
+  transform: rotate(-90deg);
+}
+
+.accordion .card-body {
+  padding: 1.5rem;
+}
+
+/* Form elements styling */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-control {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--accent);
+  color: var(--text);
+  transition: all var(--transition-speed);
+}
+
+.form-control:focus {
+  border-color: var(--highlight);
+  box-shadow: 0 0 0 2px rgba(136, 189, 242, 0.25);
+}
+
+/* Select dropdown styling */
+select.form-control {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2388BDF2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 16px 12px;
+  padding-right: 2rem;
+}
+
+/* Checkbox styling */
+.styled-checkboxes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.form-check {
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  position: relative;
+  transition: background var(--transition-speed);
+}
+
+.form-check:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.form-check-input {
+  margin-right: 0.5rem;
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+  appearance: none;
+  border: 2px solid var(--accent);
+  border-radius: 4px;
+  background: transparent;
+  position: relative;
+}
+
+.form-check-input:checked {
+  background-color: var(--accent);
+}
+
+.form-check-input:checked::after {
+  content: '✓';
+  position: absolute;
+  color: #000;
+  font-size: 12px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.form-check-label {
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+/* Processing steps list */
+.processing-steps {
+  padding-left: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.processing-steps li {
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(20, 30, 40, 0.6);
+  border-radius: 0.5rem;
+}
+
+/* Button styling */
+.action-button {
+  background: var(--accent);
+  color: #000;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all var(--transition-speed);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.action-button:hover {
+  background: var(--highlight-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.form-actions {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Alert styling */
+.alert {
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  background: rgba(20, 30, 40, 0.6);
+  margin-bottom: 1rem;
+}
+
+.notice-text {
+  color: #8a8a8a;
+  font-style: italic;
+}
+
+/* Table container styling */
+.table-container {
+  overflow-x: auto;
+  margin-top: 1rem;
+  border-radius: var(--border-radius);
+  background: rgba(20, 30, 40, 0.6);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .styled-checkboxes {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+  
+  .preprocessing-section {
+    padding: 1.5rem;
+  }
+  
+  .stat-card {
+    min-width: 100%;
+  }
+}
+
+/* Animation for accordion */
+.collapse {
+  transition: height 0.35s ease;
+}
+
+/* Table styling adjustments */
+.styled-table {
+  width: 100%;
+  margin: 0;
+}
+
+.styled-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+/* Table specific styling - matching your template */
+.styled-preview table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+    background-color: #1c1c1c;
+    color: #e0e0e0;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .styled-preview th,
+  .styled-preview td {
+    padding: 0.75rem 1rem;
+    border: 1px solid #2a2a2a;
+    text-align: center;
+  }
+  
+  .styled-preview th {
+    background-color: #2f2f2f;
+    color: #4fc3f7;
+    font-weight: 600;
+    text-transform: uppercase;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  
+  .styled-preview tr:nth-child(even) {
+    background-color: #212121;
+  }
+  
+  .styled-preview tr:hover {
+    background-color: #333;
+    transition: background-color 0.3s ease;
+  }

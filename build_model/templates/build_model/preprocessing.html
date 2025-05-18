@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dataset Preprocessing{% endblock %}
+
+{% block css_files %}
+<link rel="stylesheet" href="{% static 'build_model/build_model.css' %}">
+<link rel="stylesheet" href="{% static 'build_model/preprocessing.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Inside your content block -->
+<div class="build-model-container">
+  
+  <aside class="sidebar" data-aos="fade-right" data-aos-duration="800">
+    <ul class="sidebar-list">
+      <li><a href="{% url 'upload' %}" title="Upload"><span class="icon icon-upload">📤</span><span class="sidebar-label">Upload</span></a></li>
+      <li><a href="{% url 'profiling' %}" title="Profiling"><span class="icon icon-profiling">📊</span><span class="sidebar-label">Profiling</span></a></li>
+      <li class="active"><a href="{% url 'preprocessing' %}" title="Preprocessing"><span class="icon icon-preprocessing">🧹</span><span class="sidebar-label">Preprocessing</span></a></li>
+      <li><a href="{% url 'model' %}" title="Model"><span class="icon icon-model">🤖</span><span class="sidebar-label">Model</span></a></li>
+      <li><a href="{% url 'predict' %}" title="Predict"><span class="icon icon-predict">🔮</span><span class="sidebar-label">Predict</span></a></li>
+      <li><a href="{% url 'dashboard' %}" title="Blockchain"><span class="icon icon-dashboard">🔗</span><span class="sidebar-label">Blockchain</span></a></li>
+      <li><a href="{% url 'download' %}" title="Download"><span class="icon icon-download">📥</span><span class="sidebar-label">Download</span></a></li>
+    </ul>
+  </aside>
+
+  <section class="main-content preprocessing-section">
+    <h1 class="section-heading">🧹 Dataset Preprocessing</h1>
+    <p class="subheading">Clean, transform and prepare your dataset for optimal modeling performance.</p>
+
+    <div class="report-container overview glass-card">
+      <h2 class="section-subheading">📊 Dataset Overview</h2>
+      <div class="stats-card profile-stats">
+        <div class="stat-card"><strong>Original Dataset:</strong> {{ original_shape.0 }} rows, {{ original_shape.1 }} columns</div>
+        {% if processed_shape %}
+        <div class="stat-card"><strong>Processed Dataset:</strong> {{ processed_shape.0 }} rows, {{ processed_shape.1 }} columns</div>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if processing_steps %}
+    <div class="report-container results glass-card">
+      <h2 class="section-subheading">✅ Processing Results</h2>
+      <div class="results-content">
+        <h3>Preprocessing Steps Applied:</h3>
+        <ol class="processing-steps">
+          {% for step in processing_steps %}
+            <li>{{ step }}</li>
+          {% endfor %}
+        </ol>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}custom-alert{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="report-container preprocessing-options glass-card">
+      <h2 class="section-subheading">🛠️ Preprocessing Options</h2>
+      
+      <form method="post" action="{% url 'preprocessing' %}" class="preprocessing-form">
+        {% csrf_token %}
+        
+        <div class="accordion" id="preprocessingAccordion">
+          <!-- 1. Missing Values Section -->
+          <div class="card">
+            <div class="card-header" id="missingValuesHeading">
+              <h3 class="mb-0">
+                <button class="btn btn-link" type="button" data-toggle="collapse" 
+                        data-target="#missingValuesCollapse" aria-expanded="true" 
+                        aria-controls="missingValuesCollapse">
+                  Handle Missing Values
+                </button>
+              </h3>
+            </div>
+
+            <div id="missingValuesCollapse" class="collapse show" 
+                 aria-labelledby="missingValuesHeading" data-parent="#preprocessingAccordion">
+              <div class="card-body">
+                {% if missing_columns %}
+                  <div class="form-group">
+                    <label class="form-label" for="missingStrategy">Select Strategy:</label>
+                    <select class="form-control" id="missingStrategy" name="missing_strategy">
+                      <option value="">-- Select Strategy --</option>
+                      <option value="drop_rows">Drop rows with missing values</option>
+                      <option value="drop_column">Drop entire column</option>
+                      <option value="fill_mean">Fill with mean (numeric columns)</option>
+                      <option value="fill_median">Fill with median (numeric columns)</option>
+                      <option value="fill_mode">Fill with mode (most frequent value)</option>
+                      <option value="fill_constant">Fill with constant value</option>
+                      <option value="fill_interpolation">Fill with interpolation (numeric: linear, text: ffill/bfill)</option>
+                    </select>
+                  </div>
+                  <div class="form-group" id="constantValueDiv" style="display:none;">
+                    <label class="form-label" for="constantValue">Constant Value:</label>
+                    <input type="text" class="form-control" id="constantValue" name="constant_value">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Select Columns with Missing Values:</label>
+                    <div class="column-selection styled-checkboxes">
+                      {% for column in missing_columns %}
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" 
+                                 name="missing_columns" value="{{ column }}" 
+                                 id="missing_{{ column }}">
+                          <label class="form-check-label" for="missing_{{ column }}">
+                            {{ column }}
+                          </label>
+                        </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                {% else %}
+                  <div class="alert notice-text">No missing values detected in the dataset.</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          
+          <!-- 2. Duplicates Section -->
+          <div class="card">
+            <div class="card-header" id="duplicatesHeading">
+              <h3 class="mb-0">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" 
+                        data-target="#duplicatesCollapse" aria-expanded="false" 
+                        aria-controls="duplicatesCollapse">
+                  Handle Duplicates
+                </button>
+              </h3>
+            </div>
+            <div id="duplicatesCollapse" class="collapse" 
+                 aria-labelledby="duplicatesHeading" data-parent="#preprocessingAccordion">
+              <div class="card-body">
+                <div class="form-check duplicate-check">
+                  <input class="form-check-input" type="checkbox" 
+                         name="remove_duplicates" id="removeDuplicates">
+                  <label class="form-check-label" for="removeDuplicates">
+                    Remove duplicate rows
+                  </label>
+                </div>
+                {% if duplicate_count %}
+                <div class="duplicate-info">
+                  <span class="badge">{{ duplicate_count }}</span> duplicate rows found in dataset
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          
+          <!-- 3. Outliers Section -->
+          <div class="card">
+            <div class="card-header" id="outliersHeading">
+              <h3 class="mb-0">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" 
+                        data-target="#outliersCollapse" aria-expanded="false" 
+                        aria-controls="outliersCollapse">
+                  Handle Outliers
+                </button>
+              </h3>
+            </div>
+            <div id="outliersCollapse" class="collapse" 
+                 aria-labelledby="outliersHeading" data-parent="#preprocessingAccordion">
+              <div class="card-body">
+                {% if columns_with_outliers %}
+                  <div class="form-group">
+                    <label class="form-label" for="outlierStrategy">Select Strategy:</label>
+                    <select class="form-control" id="outlierStrategy" name="outlier_strategy">
+                      <option value="">-- Select Strategy --</option>
+                      <option value="remove_outliers">Remove rows with outliers</option>
+                      <option value="cap_outliers">Cap outliers at boundary values (IQR method)</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Select Columns with Outliers:</label>
+                    <div class="column-selection styled-checkboxes">
+                      {% for column in columns_with_outliers %}
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" 
+                                 name="outlier_columns" value="{{ column }}" 
+                                 id="outlier_{{ column }}">
+                          <label class="form-check-label" for="outlier_{{ column }}">
+                            {{ column }}
+                          </label>
+                        </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                {% else %}
+                  <div class="alert notice-text">No outliers detected in the dataset.</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. Feature Engineering Section (New) -->
+          <div class="card">
+            <div class="card-header" id="featureEngineeringHeading">
+              <h3 class="mb-0">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" 
+                        data-target="#featureEngineeringCollapse" aria-expanded="false" 
+                        aria-controls="featureEngineeringCollapse">
+                  Feature Engineering
+                </button>
+              </h3>
+            </div>
+            <div id="featureEngineeringCollapse" class="collapse" 
+                 aria-labelledby="featureEngineeringHeading" data-parent="#preprocessingAccordion">
+              <div class="card-body">
+                <div class="form-group">
+                  <label class="form-label" for="normalizationStrategy">Normalization/Scaling:</label>
+                  <select class="form-control" id="normalizationStrategy" name="normalization_strategy">
+                    <option value="">-- No Scaling --</option>
+                    <option value="min_max">Min-Max Scaling (0-1)</option>
+                    <option value="standard">Standard Scaling (Z-score)</option>
+                    <option value="robust">Robust Scaling (using median and IQR)</option>
+                  </select>
+                </div>
+                
+                <div class="form-group">
+                  <label class="form-label">Select Columns for Normalization:</label>
+                  <div class="column-selection styled-checkboxes">
+                    {% for column in numeric_columns %}
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" 
+                               name="normalization_columns" value="{{ column }}" 
+                               id="norm_{{ column }}">
+                        <label class="form-check-label" for="norm_{{ column }}">
+                          {{ column }}
+                        </label>
+                      </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn-submit action-button">
+            <span class="button-icon">✓</span> Apply Preprocessing
+          </button>
+        </div>
+      </form>
+    </div>
+    
+    <!-- Data Preview Card -->
+    {% if preview_data %}
+    <div class="report-container preview glass-card">
+      <h2 class="section-subheading">👁️ Dataset Preview</h2>
+      <div class="dataset-preview styled-preview">
+        {{ preview_data|safe }}
+      </div>
+    </div>
+    {% endif %}
+    
+  </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Show/hide constant value input field based on missing values strategy selection
+  document.getElementById('missingStrategy').addEventListener('change', function() {
+    const constantValueDiv = document.getElementById('constantValueDiv');
+    if (this.value === 'fill_constant') {
+      constantValueDiv.style.display = 'block';
+    } else {
+      constantValueDiv.style.display = 'none';
+    }
+  });
+
+  // Add animation to cards
+  document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('.glass-card');
+    cards.forEach((card, index) => {
+      card.style.animationDelay = `${index * 0.1}s`;
+    });
+  });
+
+  // Improve accordion interaction
+  const accordionButtons = document.querySelectorAll('.accordion .btn-link');
+  accordionButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const isCollapsed = this.classList.contains('collapsed');
+      if (!isCollapsed) {
+        this.classList.add('collapsed');
+      } else {
+        this.classList.remove('collapsed');
+      }
+    });
+  });
+</script>
+{% endblock %}

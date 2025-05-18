@@ -1,0 +1,87 @@
+/* Model page specific styles */
+.summary-container {
+    background: var(--glass-dark);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border-glow);
+  }
+  
+  .checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  
+  .checkbox-group label {
+    display: flex;
+    align-items: center;
+    margin-right: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .progress-container {
+    background: var(--glass-dark);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    margin-top: 2rem;
+    border: 1px solid var(--border-glow);
+  }
+  
+  .progress-title {
+    font-size: 1.2rem;
+    color: var(--accent);
+  }
+  
+  .progress-text {
+    font-size: 1rem;
+    color: #bbb;
+  }
+  
+  .progress-bar {
+    width: 100%;
+    margin-top: 1rem;
+    height: 20px;
+    background-color: #1a1a1a;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  
+  .report-container {
+    background: var(--glass-dark);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    margin-top: 2rem;
+    border: 1px solid var(--border-glow);
+  }
+  
+  .report-title {
+    font-size: 1.2rem;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+  
+  .report-metrics {
+    font-size: 1rem;
+    color: #bbb;
+  }
+  
+  .upload-container {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    margin-top: 2rem;
+    border: 1px solid var(--border-glow);
+  }
+  
+  .upload-title {
+    font-size: 1.5rem;
+    color: var(--accent);
+  }
+  
+  .upload-status {
+    font-size: 1rem;
+    color: #bbb;
+    margin-top: 1rem;
+  }

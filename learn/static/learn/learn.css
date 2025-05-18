@@ -1,0 +1,173 @@
+/* Full screen container for the background and content */
+.learn-container {
+    position: relative;
+    padding: 4rem 2rem;
+    background-color: #f5f5f5;
+    color: black;
+    min-height: 100vh;
+    overflow: hidden;
+    z-index: 1;
+  }
+  
+  /* 3D Spline background */
+  .spline-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%; /* Full height of the viewport */
+    z-index: -1; /* Ensure it's behind all content */
+    opacity: 0.7; /* Slight opacity for background effect */
+    overflow: hidden;
+  }
+  
+  /* Ensure the Spline viewer fits the container */
+  .spline-background spline-viewer {
+    width: 100%;
+    height: 100%;
+    border: none;
+    transform: scale(1.2); /* Scale the 3D object */
+  }
+  
+  /* Hide the Spline logo */
+  spline-viewer::part(logo) {
+    display: none !important;
+  }
+  
+  /* Content should be above the background */
+  .learn-container > *:not(.spline-background) {
+    position: relative;
+    z-index: 1;
+  }
+  
+  /* Search Box Section */
+  .search-box {
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto 4rem auto;
+  }
+  
+  .search-box h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 1rem;
+  }
+  
+  .search-box form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .search-box input {
+    padding: 0.8rem;
+    font-size: 1rem;
+    width: 300px;
+    border: 1px solid #ccc;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    color: #333;
+  }
+  
+  .search-box select {
+    padding: 0.8rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+  }
+  
+  .search-box button {
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+    background-color: #4fc3f7;
+    color: white;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  
+  .search-box button:hover {
+    transform: scale(1.05);
+  }
+  
+  /* Results Section */
+  .result-title {
+    font-size: 2rem;
+    text-align: center;
+    margin-top: 3rem;
+  }
+  
+  .results-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+  
+  .result-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 2rem;
+    border-radius: 1.5rem;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+    width: 300px;
+    text-align: center;
+  }
+  
+  .result-card iframe {
+    width: 100%;
+    height: 200px;
+    border-radius: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .result-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .result-card p {
+    font-size: 1rem;
+    color: #666;
+  }
+  
+  .result-card a {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.5rem 1.5rem;
+    background-color: #4fc3f7;
+    color: white;
+    text-decoration: none;
+    border-radius: 999px;
+  }
+  
+  .result-card a:hover {
+    background-color: #3498db;
+  }
+  
+  /* Responsive tweaks */
+  @media (max-width: 768px) {
+    .search-box h1 {
+      font-size: 2rem;
+    }
+  
+    .search-box input,
+    .search-box select,
+    .search-box button {
+      width: 100%;
+      padding: 0.7rem;
+    }
+  
+    .result-card {
+      width: 100%;
+    }
+  }
+  

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Login{% endblock %}
+
+{% block css_files %}
+  <link rel="stylesheet" href="{% static 'accounts/login.css' %}">
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.82/build/spline-viewer.js"></script>
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      AOS.init();
+    });
+  </script>
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+  <div class="login-box" data-aos="fade-right" data-aos-duration="1500">
+    <h2>Welcome Back</h2>
+
+    {% if messages %}
+      {% for message in messages %}
+        <p class="message">{{ message }}</p>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Login</button>
+    </form>
+
+    <p class="signup-link">Don't have an account? <a href="{% url 'register' %}">Register here</a></p>
+  </div>
+
+  <spline-viewer
+    class="spline-model"
+    url="https://prod.spline.design/RjZn-xcOpKGuxkSU/scene.splinecode"
+    data-aos="fade-left"
+    data-aos-duration="1500">
+  </spline-viewer>
+</div>
+{% endblock %}

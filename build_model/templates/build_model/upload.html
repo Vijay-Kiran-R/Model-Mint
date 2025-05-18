@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Upload Dataset{% endblock %}
+
+{% block css_files %}
+<link rel="stylesheet" href="{% static 'build_model/base.css' %}">
+<link rel="stylesheet" href="{% static 'build_model/upload.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Inside your content block -->
+<div class="build-model-container">
+  <aside class="sidebar" data-aos="fade-right" data-aos-duration="800">
+    <ul class="sidebar-list">
+      <li class="active"><a href="{% url 'upload' %}" title="Upload"><span class="icon icon-upload">📤</span><span class="sidebar-label">Upload</span></a></li>
+      <li><a href="{% url 'profiling' %}" title="Profiling"><span class="icon icon-profiling">📊</span><span class="sidebar-label">Profiling</span></a></li>
+      <li><a href="{% url 'preprocessing' %}" title="Preprocessing"><span class="icon icon-preprocessing">🧹</span><span class="sidebar-label">Preprocessing</span></a></li>
+      <li><a href="{% url 'model' %}" title="Model"><span class="icon icon-model">🤖</span><span class="sidebar-label">Model</span></a></li>
+      <li><a href="{% url 'predict' %}" title="Predict"><span class="icon icon-predict">🔮</span><span class="sidebar-label">Predict</span></a></li>
+      <li><a href="{% url 'dashboard' %}" title="Blockchain"><span class="icon icon-dashboard">🔗</span><span class="sidebar-label">Blockchain</span></a></li>
+      <li><a href="{% url 'download' %}" title="Download"><span class="icon icon-download">📥</span><span class="sidebar-label">Download</span></a></li>
+    </ul>
+  </aside>
+  
+  <section class="main-content upload-section">
+    <h1 class="section-heading">📤 Upload Your Dataset</h1>
+    <p class="subheading">Upload a CSV or Excel file to begin analyzing your data</p>
+
+    {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+      <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %} custom-alert">
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="main-upload-container glass-card">
+      {% if not uploaded_file %}
+      <form action="{% url 'upload' %}" method="POST" enctype="multipart/form-data" class="upload-form dataset-upload-form">
+        {% csrf_token %}
+        <label for="dataset" class="upload-label">Choose a CSV or Excel file:</label>
+        <input type="file" name="dataset" id="dataset" accept=".csv, .xlsx, .xls" required class="upload-input">
+        <button type="submit" class="upload-btn">Upload Dataset</button>
+      </form>
+      {% else %}
+      <div class="file-info uploaded-file-info">
+        <p><strong>Uploaded File:</strong> {{ uploaded_file }}</p>
+        <form action="{% url 'upload' %}" method="POST">
+          {% csrf_token %}
+          <button type="submit" name="reupload" class="upload-btn reupload-btn">Upload Different File</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+
+    {% if preview_data %}
+    <div class="report-container preview glass-card">
+      <h2 class="section-subheading">👁️ Dataset Preview</h2>
+      <div class="dataset-preview styled-preview">
+        {{ preview_data|safe }}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Add this after your file upload form -->
+    <div class="scraping-option glass-card">
+      <h2 class="section-subheading">🌐 Or Scrape Data from a Website</h2>
+      <form action="{% url 'upload' %}" method="POST" class="scraping-form">
+        {% csrf_token %}
+        <label for="scrape_url" class="upload-label">Website URL:</label>
+        <input type="url" name="scrape_url" id="scrape_url" placeholder="https://example.com/data" class="upload-input" required>
+        <button type="submit" name="scrape_data" class="upload-btn">Scrape Data</button>
+      </form>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get the scrape form
+    const scrapeForm = document.querySelector('.scraping-form');
+    
+    if (scrapeForm) {
+        scrapeForm.addEventListener('submit', function() {
+            // Create and show the loading indicator
+            const loadingDiv = document.createElement('div');
+            loadingDiv.classList.add('loading-indicator');
+            loadingDiv.innerHTML = '<p>Scraping data, please wait...</p><div class="spinner"></div>';
+            
+            scrapeForm.after(loadingDiv);
+            
+            // Disable form submission button
+            const submitBtn = scrapeForm.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Scraping...';
+        });
+    }
+    
+    // Add hover effects to the sidebar items
+    const sidebarItems = document.querySelectorAll('.sidebar-list li');
+    sidebarItems.forEach(item => {
+        item.addEventListener('mouseenter', () => {
+            if (!item.classList.contains('active')) {
+                item.style.backgroundColor = 'rgba(136, 189, 242, 0.1)';
+            }
+        });
+        
+        item.addEventListener('mouseleave', () => {
+            if (!item.classList.contains('active')) {
+                item.style.backgroundColor = '';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

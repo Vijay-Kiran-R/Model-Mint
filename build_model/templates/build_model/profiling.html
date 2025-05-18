@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dataset Profiling{% endblock %}
+
+{% block css_files %}
+<link rel="stylesheet" href="{% static 'build_model/build_model.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Inside your content block -->
+<div class="build-model-container">
+  
+  <aside class="sidebar" data-aos="fade-right" data-aos-duration="800">
+    <ul>
+      <li><a href="{% url 'upload' %}" title="Upload"><span class="icon">📤</span><span class="label">Upload</span></a></li>
+      <li class="active"><a href="{% url 'profiling' %}" title="Profiling"><span class="icon">📊</span><span class="label">Profiling</span></a></li>
+      <li><a href="{% url 'preprocessing' %}" title="Preprocessing"><span class="icon">🧹</span><span class="label">Preprocessing</span></a></li>
+      <li><a href="{% url 'model' %}" title="Model"><span class="icon">🤖</span><span class="label">Model</span></a></li>
+      <li><a href="{% url 'predict' %}" title="Predict"><span class="icon">🔮</span><span class="label">Predict</span></a></li>
+      <li><a href="{% url 'dashboard' %}" title="Blockchain"><span class="icon">🔗</span><span class="label">Blockchain</span></a></li>
+      <li><a href="{% url 'download' %}" title="Download"><span class="icon">📥</span><span class="label">Download</span></a></li>
+    </ul>
+  </aside>
+
+  <section class="main-content profiling-section">
+    <h1 class="section-heading">📊 Dataset Profiling Report</h1>
+    <p class="subheading">A detailed analysis of your dataset, including statistics, missing values, outliers, and correlation matrix.</p>
+
+    <div class="report-container overview">
+      <h2 class="section-subheading">Overview</h2>
+      <div class="stats-card profile-stats">
+        <div class="card stat-card"><strong>Rows:</strong> {{ num_rows }}</div>
+        <div class="card stat-card"><strong>Columns:</strong> {{ num_cols }}</div>
+        <div class="card stat-card"><strong>Memory Usage:</strong> {{ memory_usage }} MB</div>
+        <div class="card stat-card"><strong>File Size:</strong> {{ file_size }} MB</div>
+        <div class="card stat-card"><strong>Duplicate Rows:</strong> {{ num_duplicates }}</div>
+      </div>
+    </div>
+
+    <div class="report-container column-analysis">
+      <h2 class="section-subheading">📈 Column Analysis</h2>
+      <div class="table-container styled-table">
+        <table class="table profiling-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Unique Values</th>
+              <th>Missing %</th>
+              <th>Min</th>
+              <th>Max</th>
+              <th>Mean</th>
+              <th>Median</th>
+              <th>Std Dev</th>
+              <th>Outliers</th>
+              <th>Most Common</th>
+              <th>Top Frequency</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for col in column_analysis %}
+          <tr>
+            <td>{{ col.name }}</td>
+            <td>{{ col.dtype }}</td>
+            <td>{{ col.unique_values }}</td>
+            <td>{{ col.missing_percent }}%</td>
+            <td>{{ col.min|default:"-" }}</td>
+            <td>{{ col.max|default:"-" }}</td>
+            <td>{{ col.mean|default:"-" }}</td>
+            <td>{{ col.median|default:"-" }}</td>
+            <td>{{ col.std_dev|default:"-" }}</td>
+            <td>{{ col.outliers|default:"-" }}</td>
+            <td>{{ col.most_common|default:"-" }}</td>
+            <td>{{ col.top_frequency|default:"-" }}</td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="report-container correlation">
+      <h2 class="section-subheading">🔗 Correlation Matrix</h2>
+      {% if pearson_corr %}
+        <div class="correlation-box">{{ pearson_corr|safe }}</div>
+      {% else %}
+        <p class="notice-text">No correlation matrix available.</p>
+      {% endif %}
+    </div>
+
+    {% if missing_heatmap_path %}
+    <div class="report-container heatmap">
+      <h3 class="plot-heading">🔥 Missing Values Heatmap</h3>
+      <img src="{{ MEDIA_URL }}plots/missing_heatmap.png" alt="Missing Values Heatmap" class="responsive-img preview-img">
+    </div>
+    {% endif %}
+
+    {% if outlier_plot_path %}
+    <div class="report-container outlier">
+      <h3 class="plot-heading">🚦 Outlier Detection</h3>
+      <img src="{{ MEDIA_URL }}plots/outlier_plot.png" alt="Outlier Detection Box Plot" class="responsive-img preview-img">
+    </div>
+    {% endif %}
+
+  </section>
+</div>
+{% endblock %}
